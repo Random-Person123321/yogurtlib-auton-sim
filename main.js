@@ -42,8 +42,9 @@ function angleDiffDeg(target, current) {
 
 // Field point (in) -> canvas point (px).
 function fieldToCanvas(x, y) {
-    // TODO
-    return { px: CANVAS_SIZE / 2, py: CANVAS_SIZE / 2 };
+    let px = canvas.width / 2 + inchesToPixels(x);
+    let py = canvas.height / 2 - inchesToPixels(y); // y is flipped for canvas
+    return { px: px, py: py };
 }
 
 // Length (in) -> length (px).
@@ -59,10 +60,33 @@ function drawDot(x, y, color) {
     ctx.fill();
 }
 
-function drawField() {
+function drawField() { // Draws the grids onto the fields
     ctx.fillStyle = "#3a3d45";
     ctx.fillRect(0, 0, CANVAS_SIZE, CANVAS_SIZE);
-    // TODO: tile grid
+
+    const half = FIELD_SIZE / 2;
+    ctx.strokeStyle = "#5a5e68";
+    ctx.lineWidth = 1;
+
+    for (let i = 0; i <= FIELD_SIZE / TILE_SIZE; i++) {
+        const v = i * TILE_SIZE - half; // tile line position in inches
+
+        // Draws vertical line connecting top to bottom
+        const top = fieldToCanvas(v, half);
+        const bottom = fieldToCanvas(v, -half);
+        ctx.beginPath();
+        ctx.moveTo(top.px, top.py);
+        ctx.lineTo(bottom.px, bottom.py);
+        ctx.stroke();
+
+        // Draws horizontal line at positions v
+        const left = fieldToCanvas(-half, v);
+        const right = fieldToCanvas(half, v);
+        ctx.beginPath();
+        ctx.moveTo(left.px, left.py);
+        ctx.lineTo(right.px, right.py);
+        ctx.stroke();
+    }
 }
 
 // style: "solid" (true pose) or "ghost" (believed pose)
