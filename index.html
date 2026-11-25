@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>YogurtLib Auton Sim</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main>
+    <canvas id="field"></canvas>
+
+    <aside id="panel">
+      <h1>Auton Sim</h1>
+
+      <div class="buttons">
+        <button id="playBtn">Play</button>
+        <button id="resetBtn">Reset</button>
+      </div>
+
+      <label>
+        Speed
+        <input id="speedSlider" type="range" min="0.25" max="4" step="0.25" value="1">
+        <span id="speedLabel">1x</span>
+      </label>
+
+      <h2>True pose</h2>
+      <pre id="truePoseText">-</pre>
+
+      <h2>Believed pose</h2>
+      <pre id="believedPoseText">-</pre>
+
+      <h2>Command</h2>
+      <pre id="commandText">-</pre>
+    </aside>
+  </main>
+
+  <script src="main.js"></script>
+</body>
+</html>
