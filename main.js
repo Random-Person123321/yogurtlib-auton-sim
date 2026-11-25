@@ -91,8 +91,44 @@ function drawField() { // Draws the grids onto the fields
 
 // style: "solid" (true pose) or "ghost" (believed pose)
 function drawRobot(pose, style) {
-    // TODO
-    drawDot(pose.x, pose.y, style === "solid" ? "#f5c542" : "#8ab4f8");
+    // Converting robot coordinates to field coordinates, then to canvas coordinates
+    const theta = deg2rad(pose.theta);
+    const cos = Math.cos(theta), sin = Math.sin(theta); // forward * cos = x, forward * sin = y
+
+    function toCanvas(forward, left) { // Converts to field coordinates by adding on to center pose, then to canvas
+        let fieldX = pose.x + forward * cos - left * sin; // + (-left) * sin(theta)
+        let fieldY = pose.y + forward * sin + left * cos; // + (left) * cos(theta)
+        return fieldToCanvas(fieldX, fieldY);
+    }
+
+
+    const halfL = ROBOT_LENGTH / 2, halfW = ROBOT_WIDTH / 2;
+    const corners = [ toCanvas(halfL, -halfW), 
+                      toCanvas(halfL, halfW), 
+                      toCanvas(-halfL, halfW), 
+                      toCanvas(-halfL, -halfW) ];
+    ctx.beginPath();
+    ctx.moveTo(corners[0].px, corners[0].py); // Move to the first corner
+    for (let i = 1; i < corners.length; i++) ctx.lineTo(corners[i].px, corners[i].py); // Joins
+    ctx.closePath(); // Closes
+
+    if (style === "solid") { // Finally decide colour
+        ctx.fillStyle = "#f5c542";
+        ctx.fill(); // Fill
+    } else {
+        ctx.strokeStyle = "#8ab4f8";
+        ctx.lineWidth = 2;
+        ctx.stroke(); // Outline
+    }
+
+    // heading line from center of the robot to the front
+    const center = toCanvas(0, 0), front = toCanvas(halfL, 0);
+    ctx.strokeStyle = style === "solid" ? "#1a1a1a" : "#8ab4f8";
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(center.px, center.py);
+    ctx.lineTo(front.px, front.py);
+    ctx.stroke();
 }
 
 
@@ -108,7 +144,7 @@ const believedPose = { x: 0, y: 0, theta: 90 };  // what odometry/MCL thinks
 // Route: mirrors yogurt::Drivetrain calls (dt.hpp), same argument names
 // ---------------------------------------------------------------------------
 
-const START_POSE = { x: -48, y: -48, theta: 90 };
+const START_POSE = { x: -48, y: -48, theta: 45 };
 
 const route = [
     { fn: "driveStraight", args: { distanceInches: 48, timeoutMs: 2000 }, params: {}, async: false },
