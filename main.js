@@ -166,6 +166,7 @@ let activeMotion = null;
 
 // A motion is { update(dt) -> true when finished }.
 function startMotion(cmd) {
+  console.log(cmd.fn)
     switch (cmd.fn) {
         case "driveStraight": return makeDriveStraight(cmd);
         case "turnToHeading": return makeTurnToHeading(cmd);
@@ -186,7 +187,14 @@ function makeTurnToHeading(cmd) {
 }
 
 function updateRunner(dt) {
-    // TODO
+    if (activeMotion == null && commandIndex < route.length) {
+      activeMotion = startMotion(route[commandIndex++]); // Hoping the ++ works the same as it does in Cpp
+    }
+    else if (activeMotion != null) {
+      let done = activeMotion.update(dt);
+      if (done) activeMotion = null;
+
+    }
 }
 
 
