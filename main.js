@@ -144,7 +144,7 @@ const believedPose = { x: 0, y: 0, theta: 90 };  // what odometry/MCL thinks
 // Route: mirrors yogurt::Drivetrain calls (dt.hpp), same argument names
 // ---------------------------------------------------------------------------
 
-const START_POSE = { x: -48, y: -48, theta: 45 };
+const START_POSE = { x: -48, y: -48, theta: 90 };
 
 const route = [
     { fn: "driveStraight", args: { distanceInches: 48, timeoutMs: 2000 }, params: {}, async: false },
