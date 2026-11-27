@@ -166,7 +166,6 @@ let activeMotion = null;
 
 // A motion is { update(dt) -> true when finished }.
 function startMotion(cmd) {
-  console.log(cmd.fn)
     switch (cmd.fn) {
         case "driveStraight": return makeDriveStraight(cmd);
         case "turnToHeading": return makeTurnToHeading(cmd);
@@ -177,8 +176,28 @@ function startMotion(cmd) {
 }
 
 function makeDriveStraight(cmd) {
-    // TODO
-    return { update(dt) { return true; } };
+    const distance = cmd.args.distanceInches; // Distance, loaded from the start motion commands which is
+                                              // taken from the path configs(route)
+    const theta = deg2rad(truePose.theta); // Current robot heading in radians
+    const targetX = truePose.x + distance * Math.cos(theta); // Same code that converts robot pose to field convention
+    const targetY = truePose.y + distance * Math.sin(theta);
+
+    function update(dt) {
+        let dx = targetX - truePose.x, dy = targetY - truePose.y;
+        let dist = Math.hypot(dx, dy);
+
+        if (dist < 1e-5) { // 0.00001
+            return true; // Done
+        }
+        let step = Math.min(dist, DRIVE_SPEED * dt); // cap to dist to not overshoot target
+        truePose.x += step * dx / dist;
+        truePose.y += step * dy / dist; // Adds up to step amount of mvmt in both axis
+        if (dist - step < 1e-5) {
+            return true; // If after this move we have arrived or not
+        }
+        else return false; // Explicit return to tell compiler
+    }
+    return { update: update }; // Pass the function itself back without calling it
 }
 
 function makeTurnToHeading(cmd) {
