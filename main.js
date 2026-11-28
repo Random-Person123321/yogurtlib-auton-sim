@@ -201,8 +201,19 @@ function makeDriveStraight(cmd) {
 }
 
 function makeTurnToHeading(cmd) {
-    // TODO
-    return { update(dt) { return true; } };
+    function update(dt) {
+        const error = cmd.args.targetDeg - truePose.theta;
+
+        let step = TURN_SPEED * dt;
+        if (step > Math.abs(error)) step = Math.abs(error);
+        truePose.theta += step * Math.sign(error); // Update position of robot by direction of intended turn
+
+        if (Math.abs(error) < 1e-5) return true;
+        else return false;
+    }
+    
+
+    return { update : update };
 }
 
 function updateRunner(dt) {
